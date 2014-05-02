@@ -1,7 +1,7 @@
 package routingTable;
 
 import java.io.Serializable;
-import timer.RowTimer;
+import timer.CustomTimer;
 
 
 public class RoutingTableRow implements Serializable, Cloneable{
@@ -14,15 +14,15 @@ public class RoutingTableRow implements Serializable, Cloneable{
 	public int DestRouterId;
 	public int LearnedFrom;
 	public boolean IsValid;
-	public transient RowTimer RowTimer;
+	public transient CustomTimer DeletionTimer;
 
 	/**
 	 * Creates a routing table row which will be stored in an array contained in the RoutingTable class
-	 * @param nextHopPortNumber port number of the neighboring router that must be sent to in order to reach the destination
+	 * @param nextHopPortNumber port number of the neighbouring router that must be sent to in order to reach the destination
 	 * @param linkCost total link cost to reach the destination
 	 * @param destRouterId router id of the destination router
-	 * @param nextHopRouterId router id of the neighboring router that must be sent to in order to reach the destination
-	 * @param learnedFrom router id of the neighboring router that this route was learned from
+	 * @param nextHopRouterId router id of the neighbouring router that must be sent to in order to reach the destination
+	 * @param learnedFrom router id of the neighbouring router that this route was learned from
 	 */
 	public RoutingTableRow(int nextHopPortNumber, int nextHopRouterId, int linkCost, int destRouterId, int learnedFrom){
 		NextHopPortNumber = nextHopPortNumber;
@@ -31,7 +31,6 @@ public class RoutingTableRow implements Serializable, Cloneable{
 		NextHopRouterId = nextHopRouterId;
 		LearnedFrom = learnedFrom;
 		IsValid = true;
-		RowTimer = new RowTimer(this);
 	}
 	
 	public boolean HasSameDestination(RoutingTableRow other){
@@ -41,8 +40,8 @@ public class RoutingTableRow implements Serializable, Cloneable{
 		return false;
 	}
 	
-	public void InitializeRowTimer(){
-		RowTimer = new RowTimer(this);
+	public void InitializeDeletionTimer(){
+		//DeletionTimer = new CustomTimer(this);
 	}
 	
 	public RoutingTableRow CloneRoutingTableRow(){

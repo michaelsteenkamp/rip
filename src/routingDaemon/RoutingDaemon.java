@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import fileParser.OutputPortInformation;
 import routingTable.RoutingTable;
 import routingTable.RoutingTableUpdater;
+import timer.CustomTimer;
 
 public class RoutingDaemon extends TimerTask{
 	
@@ -89,6 +90,7 @@ public class RoutingDaemon extends TimerTask{
 					RoutingTable tableToSend = Table.CloneRoutingTable();
 					TableUpdater.SetMetricsToInfinity(tableToSend, output.RouterId);
 					TableUpdater.AddLinkCost(tableToSend, output.LinkCost);
+					tableToSend.MyRouterId = RouterId;
 					// Write new table into object output stream
 					objectOutputStream.writeObject(tableToSend);
 					objectOutputStream.flush();
@@ -107,20 +109,21 @@ public class RoutingDaemon extends TimerTask{
 	 * @param portNumber The port on which the routing table has been received
 	 */
 	private void updateRoutingTable(RoutingTable received){
-		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId);
+		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId, OutputPorts);
 		System.out.print(Table);
 	}
 	
 	private void markRowsAsInvalid(int routerId){
 		TableUpdater.MarkRowsAsInvalid(Table, routerId);
+		System.out.print(Table);
 	}
 	
 	class InputSocket implements Runnable {
 		
 		public DatagramSocket Socket;
-		public int AssociatedRouterId;
-		public Timer InvalidTimer;
-		private long timeoutDurationMs = 30000;
+		public int AssociatedRouterId = 0;
+		public CustomTimer InvalidTimer;
+		private int timeoutTicks = 30;
 		
 		
 		public InputSocket(int port){
@@ -147,8 +150,7 @@ public class RoutingDaemon extends TimerTask{
 		 * the run method will be called at the specified interval set by this method
 		 */
 		private void createTimerAndSetInterval(){
-			InvalidTimer = new Timer();
-			InvalidTimer.schedule(new InvalidTask(), timeoutDurationMs);
+			InvalidTimer = new CustomTimer(new InvalidTask(), timeoutTicks);
 		}
 		
 		/**
@@ -159,7 +161,7 @@ public class RoutingDaemon extends TimerTask{
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			try{
 				Socket.receive(packet);
-				rescheduleInvalidTimer();
+				InvalidTimer.resetTicks();
 				ByteArrayInputStream byteArray = new ByteArrayInputStream(buffer);
 				ObjectInputStream inputStream = new ObjectInputStream(byteArray);
 				RoutingTable table = (RoutingTable)inputStream.readObject();
@@ -168,19 +170,6 @@ public class RoutingDaemon extends TimerTask{
 			} catch (Exception e){
 				e.printStackTrace();
 			}
-
-		}
-		
-		/**
-		 * Reschedules the invalid timer and cancels it if it is already running
-		 */
-		private void rescheduleInvalidTimer(){
-			try{
-				InvalidTimer.cancel();
-			} catch (Exception e){
-				
-			}
-			InvalidTimer.schedule(new InvalidTask(), timeoutDurationMs);
 		}
 		
 		class InvalidTask extends TimerTask {

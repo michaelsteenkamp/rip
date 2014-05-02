@@ -52,14 +52,13 @@ public class RoutingTable implements Serializable {
 					Integer.toString(row.NextHopPortNumber),
 					Integer.toString(row.LearnedFrom),
 					Boolean.toString(row.IsValid),
-					Integer.toString(row.RowTimer.getTicks())
 			};
 			tableCount++;
 		}
 		
-		String output = "DestRouterId  LinkCost  NextHopRouterId  NextHopPortNumber  LearnedFrom  IsValid  RowTimerTicks\n";
+		String output = "DestRouterId  LinkCost  NextHopRouterId  NextHopPortNumber  LearnedFrom  IsValid\n";
 		for (final Object[] row : table) {
-		    output += String.format("%5s%15s%15s%15s%15s%15s%15s\n", row);
+		    output += String.format("%5s%15s%15s%15s%15s%15s\n", row);
 		}
 		
 		return output;
