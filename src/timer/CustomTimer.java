@@ -3,8 +3,6 @@ package timer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import routingTable.RoutingTableRow;
-
 public class CustomTimer extends TimerTask {
 	public Timer UtilTimer;
 	private int CurrentTicks = 0;
