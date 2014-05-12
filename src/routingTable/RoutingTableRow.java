@@ -65,6 +65,7 @@ public class RoutingTableRow implements Serializable, Cloneable {
 
 	public void InitializeAndResetRowTimeoutTimer() {
 		try {
+			System.out.println("Timer reset for: " + DestRouterId);
 			TimeoutTimer.resetTicks();
 		} catch (Exception e) {
 			TimeoutTimer = new CustomTimer(new RowTimeoutTask(), 30);
@@ -75,6 +76,7 @@ public class RoutingTableRow implements Serializable, Cloneable {
 	class RowTimeoutTask extends TimerTask {
 
 		public void run() {
+			
 			LinkCost = 16;
 			InitializeAndResetDeletionTimer();
 		}

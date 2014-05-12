@@ -1,0 +1,3 @@
+router-id 2
+input-ports 1106, 2016
+outputs 1105-5-1, 2105-5-3

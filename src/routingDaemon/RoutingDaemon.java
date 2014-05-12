@@ -91,7 +91,6 @@ public class RoutingDaemon extends TimerTask {
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(
 						arrayOutputStream);
 				// Set metrics to infinity and add link cost
-
 				RoutingTable tableToSend = Table.CloneRoutingTable();
 				TableUpdater.SetMetricsToInfinity(tableToSend, output.RouterId);
 				TableUpdater.AddLinkCost(tableToSend, output.LinkCost);
@@ -118,7 +117,7 @@ public class RoutingDaemon extends TimerTask {
 	 *            The port on which the routing table has been received
 	 */
 	private void updateRoutingTable(RoutingTable received) {
-		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId,
+		TableUpdater.ProcessIncomingRoutingTable2(Table, received, RouterId,
 				OutputPorts);
 		System.out.print(Table);
 	}
@@ -189,6 +188,7 @@ public class RoutingDaemon extends TimerTask {
 
 			@Override
 			public void run() {
+				System.out.println("Invalid timer marking rows as invalid: " + AssociatedRouterId);
 				RoutingDaemon.this.markRowsAsInvalid(AssociatedRouterId);
 			}
 

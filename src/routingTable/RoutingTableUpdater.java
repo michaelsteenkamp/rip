@@ -47,6 +47,7 @@ public class RoutingTableUpdater {
 			ArrayList<OutputPortInformation> myOutputPorts) {
 		for (RoutingTableRow receivedRow : received.Rows) {
 			boolean matched = false;
+
 			for (RoutingTableRow currentRow : current.Rows) {
 				if (receivedRow.DestRouterId == currentRow.DestRouterId) {
 					// There is already an entry for this destination in the
@@ -60,7 +61,6 @@ public class RoutingTableUpdater {
 						currentRow.NextHopPortNumber = GetOutputPortFromRouterId(
 								myOutputPorts, received.MyRouterId);
 					}
-					currentRow.InitializeAndResetRowTimeoutTimer();
 				}
 			}
 			// This received row does not match any rows in the current routing
@@ -76,11 +76,71 @@ public class RoutingTableUpdater {
 		}
 	}
 
+	public synchronized void ProcessIncomingRoutingTable2(RoutingTable current,
+			RoutingTable received, int myRouterId,
+			ArrayList<OutputPortInformation> myOutputPorts) {
+
+		for (RoutingTableRow receivedRow : received.Rows) {
+			boolean matched = false;
+
+			for (RoutingTableRow currentRow : current.Rows) {
+				if (receivedRow.DestRouterId == currentRow.DestRouterId) {
+					matched = true;
+
+					if (receivedRow.LinkCost < currentRow.LinkCost) {
+						current.Rows.remove(currentRow);
+						current.Rows.add(receivedRow);
+						receivedRow.NextHopRouterId = received.MyRouterId;
+						receivedRow.LearnedFrom = received.MyRouterId;
+						receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
+								myOutputPorts, received.MyRouterId);
+						receivedRow.InitializeAndResetRowTimeoutTimer();
+					}
+
+					currentRow.InitializeAndResetRowTimeoutTimer();
+				}
+
+				if (received.MyRouterId == currentRow.NextHopRouterId
+						&& currentRow.LinkCost == 16) {
+					currentRow.InitializeAndResetRowTimeoutTimer();
+					currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
+							myOutputPorts, currentRow.NextHopRouterId);
+				}
+
+				if(received.MyRouterId == currentRow.NextHopRouterId){
+					currentRow.InitializeAndResetRowTimeoutTimer();
+				}
+
+			}
+
+			if (!matched && receivedRow.DestRouterId != myRouterId) {
+				current.Rows.add(receivedRow);
+				receivedRow.NextHopRouterId = received.MyRouterId;
+				receivedRow.LearnedFrom = received.MyRouterId;
+				receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
+						myOutputPorts, received.MyRouterId);
+				receivedRow.InitializeAndResetRowTimeoutTimer();
+
+			}
+
+		}
+	}
+
 	private int GetOutputPortFromRouterId(
 			ArrayList<OutputPortInformation> outputPorts, int routerId) {
 		for (OutputPortInformation output : outputPorts) {
 			if (output.RouterId == routerId) {
 				return output.PortNumber;
+			}
+		}
+		return 0;
+	}
+
+	private int GetLinkCostFromNextHopRouterId(
+			ArrayList<OutputPortInformation> outputPorts, int nextHopRouterId) {
+		for (OutputPortInformation output : outputPorts) {
+			if (output.RouterId == nextHopRouterId) {
+				return output.LinkCost;
 			}
 		}
 		return 0;

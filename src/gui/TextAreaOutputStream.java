@@ -4,18 +4,20 @@ import java.io.OutputStream;
 
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
-
+/*
+ * This class allows a text area to be bound to the system.out
+ */
 public class TextAreaOutputStream extends OutputStream {
-	private JTextArea textControl;
+	private JTextArea textArea;
 	private int carretCount = 0;
 
 	public TextAreaOutputStream(JTextArea control) {
-		textControl = control;
+		textArea = control;
 	}
 
 	public void write(int b) throws IOException {
-		textControl.append(String.valueOf((char) b));
+		textArea.append(String.valueOf((char) b));
 		carretCount++;
-		textControl.setCaretPosition(carretCount);
+		textArea.setCaretPosition(carretCount);
 	}
 }

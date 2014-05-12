@@ -1,0 +1,3 @@
+router-id 3
+input-ports 2105
+outputs 2106-5-2
