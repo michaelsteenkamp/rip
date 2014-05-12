@@ -41,19 +41,20 @@ public class RoutingTableUpdater {
 
 	public void RemoveRowsFlaggedForDeletion(RoutingTable input) {
 		Iterator<RoutingTableRow> rowIterator = input.Rows.iterator();
-		
-		while(rowIterator.hasNext()){
+
+		while (rowIterator.hasNext()) {
 			RoutingTableRow row = rowIterator.next();
-			if(row.DeleteThisRow){
-				input.Rows.remove(row);
+			if (row.DeleteThisRow) {
+				System.out.println("ROW REMOVED: " + row.DestRouterId);
+				rowIterator.remove();
 			}
 		}
+
 	}
 
 	/**
-	 * Processes and updates the current routing table based on the received
 	 * routing table
-	 */
+	
 	public synchronized void ProcessIncomingRoutingTable(RoutingTable current,
 			RoutingTable received, int myRouterId,
 			ArrayList<OutputPortInformation> myOutputPorts) {
@@ -73,11 +74,14 @@ public class RoutingTableUpdater {
 						currentRow.NextHopPortNumber = GetOutputPortFromRouterId(
 								myOutputPorts, received.MyRouterId);
 					}
+
 				}
 			}
 			// This received row does not match any rows in the current routing
 			// table
-			if (!matched && receivedRow.DestRouterId != myRouterId) {
+			if (!matched && receivedRow.DestRouterId != myRouterId
+					&& receivedRow.LinkCost < 16) {
+				System.out.println("ADDED ROW");
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
 				receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
@@ -86,7 +90,7 @@ public class RoutingTableUpdater {
 				current.Rows.add(receivedRow);
 			}
 		}
-	}
+	} */
 
 	public synchronized void ProcessIncomingRoutingTable2(RoutingTable current,
 			RoutingTable received, int myRouterId,
@@ -119,13 +123,13 @@ public class RoutingTableUpdater {
 							myOutputPorts, currentRow.NextHopRouterId);
 				}
 
-				if (received.MyRouterId == currentRow.NextHopRouterId) {
+				/*if (received.MyRouterId == currentRow.NextHopRouterId) {
 					currentRow.InitializeAndResetRowTimeoutTimer();
-				}
+				}*/
 
 			}
 
-			if (!matched && receivedRow.DestRouterId != myRouterId) {
+			if (!matched && receivedRow.DestRouterId != myRouterId && receivedRow.LinkCost < 16) {
 				current.Rows.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
@@ -134,7 +138,6 @@ public class RoutingTableUpdater {
 				receivedRow.InitializeAndResetRowTimeoutTimer();
 
 			}
-
 		}
 	}
 
