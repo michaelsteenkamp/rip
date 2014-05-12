@@ -90,6 +90,8 @@ public class RoutingDaemon extends TimerTask {
 				ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(
 						arrayOutputStream);
+				// Remove invalid rows which have been flagged for deletion
+				TableUpdater.RemoveRowsFlaggedForDeletion(Table);
 				// Set metrics to infinity and add link cost
 				RoutingTable tableToSend = Table.CloneRoutingTable();
 				TableUpdater.SetMetricsToInfinity(tableToSend, output.RouterId);
@@ -188,7 +190,8 @@ public class RoutingDaemon extends TimerTask {
 
 			@Override
 			public void run() {
-				System.out.println("Invalid timer marking rows as invalid: " + AssociatedRouterId);
+				System.out.println("Invalid timer marking rows as invalid: "
+						+ AssociatedRouterId);
 				RoutingDaemon.this.markRowsAsInvalid(AssociatedRouterId);
 			}
 

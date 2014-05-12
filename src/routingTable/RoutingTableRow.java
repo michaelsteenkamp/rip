@@ -16,6 +16,7 @@ public class RoutingTableRow implements Serializable, Cloneable {
 	public int LearnedFrom;
 	public transient CustomTimer TimeoutTimer;
 	public transient CustomTimer DeletionTimer;
+	public boolean DeleteThisRow = false;
 
 	/**
 	 * Creates a routing table row which will be stored in an array contained in
@@ -85,7 +86,7 @@ public class RoutingTableRow implements Serializable, Cloneable {
 	class RowDeletionTask extends TimerTask {
 
 		public void run() {
-
+			DeleteThisRow = true;
 		}
 	}
 

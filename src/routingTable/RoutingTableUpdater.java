@@ -1,6 +1,7 @@
 package routingTable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import fileParser.OutputPortInformation;
 
@@ -35,6 +36,17 @@ public class RoutingTableUpdater {
 	public void AddLinkCost(RoutingTable input, int linkCost) {
 		for (RoutingTableRow row : input.Rows) {
 			row.LinkCost += linkCost;
+		}
+	}
+
+	public void RemoveRowsFlaggedForDeletion(RoutingTable input) {
+		Iterator<RoutingTableRow> rowIterator = input.Rows.iterator();
+		
+		while(rowIterator.hasNext()){
+			RoutingTableRow row = rowIterator.next();
+			if(row.DeleteThisRow){
+				input.Rows.remove(row);
+			}
 		}
 	}
 
@@ -107,7 +119,7 @@ public class RoutingTableUpdater {
 							myOutputPorts, currentRow.NextHopRouterId);
 				}
 
-				if(received.MyRouterId == currentRow.NextHopRouterId){
+				if (received.MyRouterId == currentRow.NextHopRouterId) {
 					currentRow.InitializeAndResetRowTimeoutTimer();
 				}
 
