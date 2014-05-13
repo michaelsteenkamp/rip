@@ -1,3 +1,3 @@
 router-id 1
-input-ports 1105
-outputs 1106-5-2
+input-ports 1024, 1031
+outputs 1025-2-2, 1030-1-4

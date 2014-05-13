@@ -1,6 +1,7 @@
 package routingTable;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import fileParser.OutputPortInformation;
@@ -52,84 +53,46 @@ public class RoutingTableUpdater {
 
 	}
 
-	/**
-	 * routing table
-	
-	public synchronized void ProcessIncomingRoutingTable(RoutingTable current,
-			RoutingTable received, int myRouterId,
-			ArrayList<OutputPortInformation> myOutputPorts) {
-		for (RoutingTableRow receivedRow : received.Rows) {
-			boolean matched = false;
-
-			for (RoutingTableRow currentRow : current.Rows) {
-				if (receivedRow.DestRouterId == currentRow.DestRouterId) {
-					// There is already an entry for this destination in the
-					// current routing table
-					matched = true;
-					if (receivedRow.LinkCost <= currentRow.LinkCost) {
-						// Replace current row with received
-						currentRow = receivedRow;
-						currentRow.NextHopRouterId = received.MyRouterId;
-						currentRow.LearnedFrom = received.MyRouterId;
-						currentRow.NextHopPortNumber = GetOutputPortFromRouterId(
-								myOutputPorts, received.MyRouterId);
-					}
-
-				}
-			}
-			// This received row does not match any rows in the current routing
-			// table
-			if (!matched && receivedRow.DestRouterId != myRouterId
-					&& receivedRow.LinkCost < 16) {
-				System.out.println("ADDED ROW");
-				receivedRow.NextHopRouterId = received.MyRouterId;
-				receivedRow.LearnedFrom = received.MyRouterId;
-				receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
-						myOutputPorts, received.MyRouterId);
-				receivedRow.InitializeAndResetRowTimeoutTimer();
-				current.Rows.add(receivedRow);
-			}
-		}
-	} */
-
 	public synchronized void ProcessIncomingRoutingTable2(RoutingTable current,
 			RoutingTable received, int myRouterId,
 			ArrayList<OutputPortInformation> myOutputPorts) {
 
 		for (RoutingTableRow receivedRow : received.Rows) {
 			boolean matched = false;
+			try {
+				for (RoutingTableRow currentRow : current.Rows) {
 
-			for (RoutingTableRow currentRow : current.Rows) {
-				if (receivedRow.DestRouterId == currentRow.DestRouterId) {
-					matched = true;
+					if (receivedRow.DestRouterId == currentRow.DestRouterId) {
+						matched = true;
 
-					if (receivedRow.LinkCost < currentRow.LinkCost) {
-						current.Rows.remove(currentRow);
-						current.Rows.add(receivedRow);
-						receivedRow.NextHopRouterId = received.MyRouterId;
-						receivedRow.LearnedFrom = received.MyRouterId;
-						receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
-								myOutputPorts, received.MyRouterId);
-						receivedRow.InitializeAndResetRowTimeoutTimer();
+						if (receivedRow.LinkCost < currentRow.LinkCost) {
+							// Replace current row with received row
+							current.Rows.remove(currentRow);
+
+							current.Rows.add(receivedRow);
+							receivedRow.NextHopRouterId = received.MyRouterId;
+							receivedRow.LearnedFrom = received.MyRouterId;
+							receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
+									myOutputPorts, received.MyRouterId);
+							receivedRow.InitializeAndResetRowTimeoutTimer();
+						} else {
+							currentRow.InitializeAndResetRowTimeoutTimer();
+						}
 					}
 
-					currentRow.InitializeAndResetRowTimeoutTimer();
+					if (received.MyRouterId == currentRow.DestRouterId
+							&& currentRow.LinkCost == 16) {
+						currentRow.InitializeAndResetRowTimeoutTimer();
+						currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
+								myOutputPorts, currentRow.NextHopRouterId);
+					}
 				}
-
-				if (received.MyRouterId == currentRow.NextHopRouterId
-						&& currentRow.LinkCost == 16) {
-					currentRow.InitializeAndResetRowTimeoutTimer();
-					currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
-							myOutputPorts, currentRow.NextHopRouterId);
-				}
-
-				/*if (received.MyRouterId == currentRow.NextHopRouterId) {
-					currentRow.InitializeAndResetRowTimeoutTimer();
-				}*/
+			} catch (ConcurrentModificationException e) {
 
 			}
 
-			if (!matched && receivedRow.DestRouterId != myRouterId && receivedRow.LinkCost < 16) {
+			if (!matched && receivedRow.DestRouterId != myRouterId
+					&& receivedRow.LinkCost < 16) {
 				current.Rows.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
