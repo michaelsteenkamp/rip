@@ -120,8 +120,7 @@ public class RoutingDaemon extends TimerTask {
 	 *            The port on which the routing table has been received
 	 */
 	private void updateRoutingTable(RoutingTable received) {
-		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId,
-				OutputPorts);
+		TableUpdater.ProcessIncomingRoutingTable(Table, received, OutputPorts);
 		System.out.print(Table);
 	}
 

@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.swing.JTextArea;
-import javax.swing.text.DefaultCaret;
 /*
  * This class allows a text area to be bound to the system.out
  */

@@ -1,7 +1,6 @@
 package routingTable;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import fileParser.OutputPortInformation;
@@ -40,6 +39,12 @@ public class RoutingTableUpdater {
 		}
 	}
 
+	/**
+	 * Remove any rows flagged for deletion.
+	 * 
+	 * @param input
+	 *            The input routing table from which rows will be removed
+	 */
 	public void RemoveRowsFlaggedForDeletion(RoutingTable input) {
 		Iterator<RoutingTableRow> rowIterator = input.getRows().iterator();
 
@@ -53,56 +58,73 @@ public class RoutingTableUpdater {
 
 	}
 
+	/**
+	 * Processes and updates the current routing table based off the received
+	 * routing table
+	 * 
+	 * @param current
+	 *            The current routing table
+	 * @param received
+	 *            The received routing table
+	 * @param myOutputPorts
+	 */
 	public synchronized void ProcessIncomingRoutingTable(RoutingTable current,
-			RoutingTable received, int myRouterId,
+			RoutingTable received,
 			ArrayList<OutputPortInformation> myOutputPorts) {
-		
+
 		ArrayList<RoutingTableRow> rowsToAddToCurrentTable = new ArrayList<RoutingTableRow>();
-		
 
 		for (RoutingTableRow receivedRow : received.getRows()) {
 			boolean matched = false;
-				//for (RoutingTableRow currentRow : current.getRows()) {
-			Iterator<RoutingTableRow> currentRowIterator = current.getRows().iterator();
-			
-			while(currentRowIterator.hasNext()){
+			// Must use an iterator in order to remove rows while iterating over
+			// the current rows
+			Iterator<RoutingTableRow> currentRowIterator = current.getRows()
+					.iterator();
+
+			while (currentRowIterator.hasNext()) {
 				RoutingTableRow currentRow = currentRowIterator.next();
-				
-					if (receivedRow.DestRouterId == currentRow.DestRouterId) {
-						matched = true;
 
-						if (receivedRow.LinkCost < currentRow.LinkCost && currentRow.LinkCost != 16) {
-							// Replace current row with received row
-							//current.Rows.remove(currentRow);
-							currentRowIterator.remove();
+				if (receivedRow.DestRouterId == currentRow.DestRouterId) {
+					matched = true;
 
-							rowsToAddToCurrentTable.add(receivedRow);
-							receivedRow.NextHopRouterId = received.MyRouterId;
-							receivedRow.LearnedFrom = received.MyRouterId;
-							receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
-									myOutputPorts, received.MyRouterId);
-							receivedRow.InitializeAndResetRowTimeoutTimer();
-						} else if (receivedRow.LinkCost < 16){
-							//We have received a valid entry for the current row
-							//It is not cheaper so don't replace the current row
-							//Just reinitialise the timeout timer.
-							currentRow.InitializeAndResetRowTimeoutTimer();
-						} else if (currentRow.NextHopRouterId == received.MyRouterId){
-							currentRow.LinkCost = receivedRow.LinkCost;
-						}
-					}
-					//A neighbouring router has come back online, reset the link cost
-					//of its row if it is still in the table
-					if (received.MyRouterId == currentRow.DestRouterId
-							&& currentRow.LinkCost == 16) {
+					if (receivedRow.LinkCost < currentRow.LinkCost
+							&& currentRow.LinkCost != 16) {
+						// Replace current row with received row
+						// current.Rows.remove(currentRow);
+						currentRowIterator.remove();
+
+						rowsToAddToCurrentTable.add(receivedRow);
+						receivedRow.NextHopRouterId = received.MyRouterId;
+						receivedRow.LearnedFrom = received.MyRouterId;
+						receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
+								myOutputPorts, received.MyRouterId);
+						receivedRow.InitializeAndResetRowTimeoutTimer();
+					} else if (receivedRow.LinkCost < 16) {
+						// We have received a valid entry for the current row
+						// It is not cheaper so don't replace the current row
+						// Just reinitialise the timeout timer.
 						currentRow.InitializeAndResetRowTimeoutTimer();
-						currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
-								myOutputPorts, currentRow.NextHopRouterId);
+						// We have learnt this row from our neighbouring router,
+						// therefore we must
+						// update its cost even if it is worse than our current
+						// link cost
+					} else if (currentRow.NextHopRouterId == received.MyRouterId) {
+						currentRow.LinkCost = receivedRow.LinkCost;
 					}
-
 				}
-			//We have received a new valid row, add it to our table
-			if(!matched && receivedRow.LinkCost < 16){
+				// A neighbouring router has come back online, reset the link
+				// cost
+				// of its row if it is still in the table
+				if (received.MyRouterId == currentRow.DestRouterId
+						&& currentRow.LinkCost == 16) {
+					currentRow.InitializeAndResetRowTimeoutTimer();
+					currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
+							myOutputPorts, currentRow.NextHopRouterId);
+				}
+
+			}
+			// We have received a new valid row, add it to our table
+			if (!matched && receivedRow.LinkCost < 16) {
 				rowsToAddToCurrentTable.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
@@ -112,8 +134,9 @@ public class RoutingTableUpdater {
 
 			}
 		}
-		
-		for(RoutingTableRow newRow : rowsToAddToCurrentTable){
+		// New rows are added here as we can not add them while iterating over
+		// the current routing table
+		for (RoutingTableRow newRow : rowsToAddToCurrentTable) {
 			current.Rows.add(newRow);
 		}
 	}
