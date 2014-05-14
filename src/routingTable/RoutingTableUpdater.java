@@ -87,6 +87,8 @@ public class RoutingTableUpdater {
 							//It is not cheaper so don't replace the current row
 							//Just reinitialise the timeout timer.
 							currentRow.InitializeAndResetRowTimeoutTimer();
+						} else if (currentRow.NextHopRouterId == received.MyRouterId){
+							currentRow.LinkCost = receivedRow.LinkCost;
 						}
 					}
 					//A neighbouring router has come back online, reset the link cost
@@ -99,9 +101,7 @@ public class RoutingTableUpdater {
 					}
 
 				}
-				 //We have received a new valid row, add it to our table
-			/*if (!matched && receivedRow.DestRouterId != myRouterId
-					&& receivedRow.LinkCost < 16) {*/
+			//We have received a new valid row, add it to our table
 			if(!matched && receivedRow.LinkCost < 16){
 				rowsToAddToCurrentTable.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;

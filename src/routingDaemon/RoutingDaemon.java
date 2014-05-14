@@ -119,7 +119,7 @@ public class RoutingDaemon extends TimerTask {
 	 * @param portNumber
 	 *            The port on which the routing table has been received
 	 */
-	private synchronized void updateRoutingTable(RoutingTable received) {
+	private void updateRoutingTable(RoutingTable received) {
 		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId,
 				OutputPorts);
 		System.out.print(Table);
@@ -136,6 +136,11 @@ public class RoutingDaemon extends TimerTask {
 		System.out.print(Table);
 	}
 
+	/**
+	 * The input socket class is used to listen for updated from neighbouring
+	 * routers, each input socket runs on its own thread so that we can listen
+	 * on multiple ports at once.
+	 */
 	class InputSocket implements Runnable {
 
 		public DatagramSocket Socket;
