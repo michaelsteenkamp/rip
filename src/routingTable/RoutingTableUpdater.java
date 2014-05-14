@@ -53,19 +53,19 @@ public class RoutingTableUpdater {
 
 	}
 
-	public synchronized void ProcessIncomingRoutingTable2(RoutingTable current,
+	public void ProcessIncomingRoutingTable2(RoutingTable current,
 			RoutingTable received, int myRouterId,
 			ArrayList<OutputPortInformation> myOutputPorts) {
 
-		for (RoutingTableRow receivedRow : received.Rows) {
+		for (RoutingTableRow receivedRow : received.getRows()) {
 			boolean matched = false;
-			try {
-				for (RoutingTableRow currentRow : current.Rows) {
+			//try {
+				for (RoutingTableRow currentRow : current.getRows()) {
 
 					if (receivedRow.DestRouterId == currentRow.DestRouterId) {
 						matched = true;
 
-						if (receivedRow.LinkCost < currentRow.LinkCost) {
+						if (receivedRow.LinkCost < currentRow.LinkCost && currentRow.LinkCost != 16) {
 							// Replace current row with received row
 							current.Rows.remove(currentRow);
 
@@ -75,7 +75,7 @@ public class RoutingTableUpdater {
 							receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
 									myOutputPorts, received.MyRouterId);
 							receivedRow.InitializeAndResetRowTimeoutTimer();
-						} else {
+						} else if (receivedRow.LinkCost < 16){
 							currentRow.InitializeAndResetRowTimeoutTimer();
 						}
 					}
@@ -86,10 +86,11 @@ public class RoutingTableUpdater {
 						currentRow.LinkCost = GetLinkCostFromNextHopRouterId(
 								myOutputPorts, currentRow.NextHopRouterId);
 					}
-				}
-			} catch (ConcurrentModificationException e) {
 
-			}
+				}
+			//} catch (ConcurrentModificationException e) {
+
+			//}
 
 			if (!matched && receivedRow.DestRouterId != myRouterId
 					&& receivedRow.LinkCost < 16) {

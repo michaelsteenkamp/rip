@@ -14,6 +14,10 @@ public class RoutingTable implements Serializable {
 		MyRouterId = id;
 		Rows = new ArrayList<RoutingTableRow>();
 	}
+	
+	synchronized ArrayList<RoutingTableRow> getRows(){
+		return Rows;
+	}
 
 	public void PopulateInitialRoutingTable(
 			ArrayList<OutputPortInformation> outputPorts) {

@@ -52,7 +52,6 @@ public class MainGUI {
 	 */
 	private void initialize() {
 		frmRip = new JFrame();
-		frmRip.setAlwaysOnTop(true);
 		frmRip.setResizable(false);
 		frmRip.setTitle("RIP");
 		frmRip.setBounds(100, 100, 615, 450);
