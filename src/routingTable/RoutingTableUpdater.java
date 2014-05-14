@@ -53,22 +53,30 @@ public class RoutingTableUpdater {
 
 	}
 
-	public void ProcessIncomingRoutingTable(RoutingTable current,
+	public synchronized void ProcessIncomingRoutingTable(RoutingTable current,
 			RoutingTable received, int myRouterId,
 			ArrayList<OutputPortInformation> myOutputPorts) {
+		
+		ArrayList<RoutingTableRow> rowsToAddToCurrentTable = new ArrayList<RoutingTableRow>();
+		
 
 		for (RoutingTableRow receivedRow : received.getRows()) {
 			boolean matched = false;
-				for (RoutingTableRow currentRow : current.getRows()) {
-
+				//for (RoutingTableRow currentRow : current.getRows()) {
+			Iterator<RoutingTableRow> currentRowIterator = current.getRows().iterator();
+			
+			while(currentRowIterator.hasNext()){
+				RoutingTableRow currentRow = currentRowIterator.next();
+				
 					if (receivedRow.DestRouterId == currentRow.DestRouterId) {
 						matched = true;
 
 						if (receivedRow.LinkCost < currentRow.LinkCost && currentRow.LinkCost != 16) {
 							// Replace current row with received row
-							current.Rows.remove(currentRow);
+							//current.Rows.remove(currentRow);
+							currentRowIterator.remove();
 
-							current.Rows.add(receivedRow);
+							rowsToAddToCurrentTable.add(receivedRow);
 							receivedRow.NextHopRouterId = received.MyRouterId;
 							receivedRow.LearnedFrom = received.MyRouterId;
 							receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
@@ -95,7 +103,7 @@ public class RoutingTableUpdater {
 			/*if (!matched && receivedRow.DestRouterId != myRouterId
 					&& receivedRow.LinkCost < 16) {*/
 			if(!matched && receivedRow.LinkCost < 16){
-				current.Rows.add(receivedRow);
+				rowsToAddToCurrentTable.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
 				receivedRow.NextHopPortNumber = GetOutputPortFromRouterId(
@@ -103,6 +111,10 @@ public class RoutingTableUpdater {
 				receivedRow.InitializeAndResetRowTimeoutTimer();
 
 			}
+		}
+		
+		for(RoutingTableRow newRow : rowsToAddToCurrentTable){
+			current.Rows.add(newRow);
 		}
 	}
 
