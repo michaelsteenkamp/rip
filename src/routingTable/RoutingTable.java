@@ -17,7 +17,7 @@ public class RoutingTable implements Serializable {
 		Rows = new ArrayList<RoutingTableRow>();
 	}
 	
-	synchronized ArrayList<RoutingTableRow> getRows(){
+	public synchronized ArrayList<RoutingTableRow> getRows(){
 		return Rows;
 	}
 
