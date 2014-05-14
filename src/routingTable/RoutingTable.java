@@ -1,6 +1,8 @@
 package routingTable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.io.Serializable;
 
 import fileParser.OutputPortInformation;
@@ -42,18 +44,27 @@ public class RoutingTable implements Serializable {
 	public RoutingTable CloneRoutingTable() {
 		RoutingTable clone = new RoutingTable(MyRouterId);
 
-		for (RoutingTableRow originalRow : Rows) {
+		for (RoutingTableRow originalRow : getRows()) {
 			clone.Rows.add(originalRow.CloneRoutingTableRow());
 		}
 
 		return clone;
 	}
+	
+	public void sortRows(){
+		Collections.sort(getRows(), new Comparator<RoutingTableRow>(){
+			@Override
+			public int compare(RoutingTableRow r1, RoutingTableRow r2){
+				return r1.DestRouterId - r2.DestRouterId;
+			}});
+	}
 
 	public String toString() {
 		final Object[][] table = new String[Rows.size()][];
-
 		int tableCount = 0;
-		for (RoutingTableRow row : Rows) {
+
+		sortRows();
+		for (RoutingTableRow row : getRows()){
 			table[tableCount] = new String[] {
 					Integer.toString(row.DestRouterId),
 					Integer.toString(row.LinkCost),

@@ -19,7 +19,7 @@ public class RoutingTableUpdater {
 	 *            will be sent to
 	 */
 	public void SetMetricsToInfinity(RoutingTable input, int neighbor) {
-		for (RoutingTableRow row : input.Rows) {
+		for (RoutingTableRow row : input.getRows()) {
 			RoutingTableRow currentRow = row;
 			if (currentRow.LearnedFrom == neighbor) {
 				currentRow.LinkCost = 16;
@@ -35,13 +35,13 @@ public class RoutingTableUpdater {
 	 *            Cost to be added to each row
 	 */
 	public void AddLinkCost(RoutingTable input, int linkCost) {
-		for (RoutingTableRow row : input.Rows) {
+		for (RoutingTableRow row : input.getRows()) {
 			row.LinkCost += linkCost;
 		}
 	}
 
 	public void RemoveRowsFlaggedForDeletion(RoutingTable input) {
-		Iterator<RoutingTableRow> rowIterator = input.Rows.iterator();
+		Iterator<RoutingTableRow> rowIterator = input.getRows().iterator();
 
 		while (rowIterator.hasNext()) {
 			RoutingTableRow row = rowIterator.next();
@@ -53,13 +53,12 @@ public class RoutingTableUpdater {
 
 	}
 
-	public void ProcessIncomingRoutingTable2(RoutingTable current,
+	public void ProcessIncomingRoutingTable(RoutingTable current,
 			RoutingTable received, int myRouterId,
 			ArrayList<OutputPortInformation> myOutputPorts) {
 
 		for (RoutingTableRow receivedRow : received.getRows()) {
 			boolean matched = false;
-			//try {
 				for (RoutingTableRow currentRow : current.getRows()) {
 
 					if (receivedRow.DestRouterId == currentRow.DestRouterId) {
@@ -76,10 +75,14 @@ public class RoutingTableUpdater {
 									myOutputPorts, received.MyRouterId);
 							receivedRow.InitializeAndResetRowTimeoutTimer();
 						} else if (receivedRow.LinkCost < 16){
+							//We have received a valid entry for the current row
+							//It is not cheaper so don't replace the current row
+							//Just reinitialise the timeout timer.
 							currentRow.InitializeAndResetRowTimeoutTimer();
 						}
 					}
-
+					//A neighbouring router has come back online, reset the link cost
+					//of its row if it is still in the table
 					if (received.MyRouterId == currentRow.DestRouterId
 							&& currentRow.LinkCost == 16) {
 						currentRow.InitializeAndResetRowTimeoutTimer();
@@ -88,12 +91,10 @@ public class RoutingTableUpdater {
 					}
 
 				}
-			//} catch (ConcurrentModificationException e) {
-
-			//}
-
-			if (!matched && receivedRow.DestRouterId != myRouterId
-					&& receivedRow.LinkCost < 16) {
+				 //We have received a new valid row, add it to our table
+			/*if (!matched && receivedRow.DestRouterId != myRouterId
+					&& receivedRow.LinkCost < 16) {*/
+			if(!matched && receivedRow.LinkCost < 16){
 				current.Rows.add(receivedRow);
 				receivedRow.NextHopRouterId = received.MyRouterId;
 				receivedRow.LearnedFrom = received.MyRouterId;
@@ -126,7 +127,7 @@ public class RoutingTableUpdater {
 	}
 
 	public void MarkRowsAsInvalid(RoutingTable current, int routerId) {
-		for (RoutingTableRow row : current.Rows) {
+		for (RoutingTableRow row : current.getRows()) {
 			if (row.NextHopRouterId == routerId) {
 				row.LinkCost = 16;
 				row.InitializeAndResetDeletionTimer();

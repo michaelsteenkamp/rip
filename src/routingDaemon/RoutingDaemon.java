@@ -120,13 +120,19 @@ public class RoutingDaemon extends TimerTask {
 	 *            The port on which the routing table has been received
 	 */
 	private void updateRoutingTable(RoutingTable received) {
-		TableUpdater.ProcessIncomingRoutingTable2(Table, received, RouterId,
+		TableUpdater.ProcessIncomingRoutingTable(Table, received, RouterId,
 				OutputPorts);
 		System.out.print(Table);
 	}
 
+	/**
+	 * 
+	 * @param routerId
+	 *            The router id of our neighbour which has timed out
+	 */
 	private void markRowsAsInvalid(int routerId) {
 		TableUpdater.MarkRowsAsInvalid(Table, routerId);
+		sendRoutingTableToNeighbors();
 		System.out.print(Table);
 	}
 
