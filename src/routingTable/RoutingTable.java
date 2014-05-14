@@ -1,9 +1,10 @@
 package routingTable;
 
+import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.io.Serializable;
 
 import fileParser.OutputPortInformation;
 
@@ -67,9 +68,9 @@ public class RoutingTable implements Serializable {
 		for (RoutingTableRow row : getRows()){
 			table[tableCount] = new String[] {
 					Integer.toString(row.DestRouterId),
-					Integer.toString(row.LinkCost),
+					new DecimalFormat("00").format(row.LinkCost),
 					Integer.toString(row.NextHopRouterId),
-					Integer.toString(row.NextHopPortNumber),
+					new DecimalFormat("0000").format(row.NextHopPortNumber),
 					Integer.toString(row.LearnedFrom),
 					Integer.toString(row.TimeoutTimer.getTicks())};
 			tableCount++;

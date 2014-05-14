@@ -50,7 +50,6 @@ public class RoutingDaemon extends TimerTask {
 			InputSocket socket = new InputSocket(port);
 			InputSockets.add(socket);
 		}
-
 	}
 
 	/**
@@ -92,7 +91,6 @@ public class RoutingDaemon extends TimerTask {
 						arrayOutputStream);
 				// Remove invalid rows which have been flagged for deletion
 				TableUpdater.RemoveRowsFlaggedForDeletion(Table);
-				System.out.println(Table);
 				// Set metrics to infinity and add link cost
 				RoutingTable tableToSend = Table.CloneRoutingTable();
 				TableUpdater.SetMetricsToInfinity(tableToSend, output.RouterId);
