@@ -143,7 +143,7 @@ public class RoutingDaemon extends TimerTask {
 		public DatagramSocket Socket;
 		public int AssociatedRouterId = 0;
 		public CustomTimer InvalidTimer;
-		private int timeoutTicks = 30;
+		private int timeoutTicks = 20;
 
 		public InputSocket(int port) {
 			try {
