@@ -6,28 +6,59 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class FileParser {
-
-	public ArrayList<String> Lines;
-	public int RouterId;
-	public ArrayList<Integer> InputPorts;
-	public ArrayList<OutputPortInformation> OutputPorts;
-
+	
+	private int RouterId;
+	private ArrayList<String> Lines = new ArrayList<String>();
+	private ArrayList<Integer> InputPorts = new ArrayList<Integer>();
+	private ArrayList<OutputPortInformation> OutputPorts = new ArrayList<OutputPortInformation>();
+	
 	public FileParser(String fileName) {
-		initalizeArrays();
 		readLines(fileName);
 		extractRoutingDaemonData();
 	}
-
+	
 	/**
-	 * Initialises all public arrays used in this class to avoid null reference
-	 * exceptions
+	 * @return the routerId
 	 */
-	private void initalizeArrays() {
-		Lines = new ArrayList<String>();
-		InputPorts = new ArrayList<Integer>();
-		OutputPorts = new ArrayList<OutputPortInformation>();
+	public int getRouterId() {
+		return RouterId;
 	}
 
+	/**
+	 * @param routerId the routerId to set
+	 */
+	public void setRouterId(int routerId) {
+		RouterId = routerId;
+	}
+
+	/**
+	 * @return the inputPorts
+	 */
+	public ArrayList<Integer> getInputPorts() {
+		return InputPorts;
+	}
+
+	/**
+	 * @param inputPorts the inputPorts to set
+	 */
+	public void setInputPorts(ArrayList<Integer> inputPorts) {
+		InputPorts = inputPorts;
+	}
+
+	/**
+	 * @return the outputPorts
+	 */
+	public ArrayList<OutputPortInformation> getOutputPorts() {
+		return OutputPorts;
+	}
+
+	/**
+	 * @param outputPorts the outputPorts to set
+	 */
+	public void setOutputPorts(ArrayList<OutputPortInformation> outputPorts) {
+		OutputPorts = outputPorts;
+	}
+	
 	/**
 	 * Reads data in the specified input file into the array 'Lines' so that it
 	 * can be extracted
