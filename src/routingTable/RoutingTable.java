@@ -10,18 +10,50 @@ import fileParser.OutputPortInformation;
 
 public class RoutingTable implements Serializable {
 	private static final long serialVersionUID = 4064137834678840042L;
+	private int MyRouterId;
 	public ArrayList<RoutingTableRow> Rows;
-	public int MyRouterId;
 
+	/**
+	 * Constructs a new RoutingTable with the specified router id
+	 * @param id Router id
+	 */
 	public RoutingTable(int id) {
 		MyRouterId = id;
 		Rows = new ArrayList<RoutingTableRow>();
 	}
 	
+	/**
+	 * @return the myRouterId
+	 */
+	public int getMyRouterId() {
+		return MyRouterId;
+	}
+
+	/**
+	 * @param myRouterId the myRouterId to set
+	 */
+	public void setMyRouterId(int myRouterId) {
+		MyRouterId = myRouterId;
+	}
+
+	/**
+	 * @param rows the rows to set
+	 */
+	public void setRows(ArrayList<RoutingTableRow> rows) {
+		Rows = rows;
+	}
+
+	/**
+	 * @return the RoutingTable rows
+	 */
 	public synchronized ArrayList<RoutingTableRow> getRows(){
 		return Rows;
 	}
 
+	/**
+	 * Populates the initial rows of the RoutingTable
+	 * @param outputPorts
+	 */
 	public void PopulateInitialRoutingTable(
 			ArrayList<OutputPortInformation> outputPorts) {
 		
@@ -37,11 +69,12 @@ public class RoutingTable implements Serializable {
 			Rows.add(row);
 		}
 		
-		
-		
 		System.out.print(this);
 	}
 
+	/**
+	 * @return A clone of the RoutingTable
+	 */
 	public RoutingTable CloneRoutingTable() {
 		RoutingTable clone = new RoutingTable(MyRouterId);
 
@@ -52,6 +85,9 @@ public class RoutingTable implements Serializable {
 		return clone;
 	}
 	
+	/**
+	 * Sorts the RoutingTable's Rows in descending order
+	 */
 	public void sortRows(){
 		Collections.sort(getRows(), new Comparator<RoutingTableRow>(){
 			@Override
