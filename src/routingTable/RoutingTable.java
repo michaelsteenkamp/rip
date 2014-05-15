@@ -114,7 +114,7 @@ public class RoutingTable implements Serializable {
 
 		String output = "DestId - LinkCost - NextHopId - NextHopPort - LearnedFrom - Ticks\n";
 		for (final Object[] row : table) {
-			output += String.format("%5s%15s%20s%20s%20s%25s\n", row);
+			output += String.format("%5s%15s%15s%15s%20s%20s\n", row);
 		}
 
 		return output;

@@ -57,12 +57,12 @@ public class MainGUI {
 		frmRip.setResizable(false);
 		frmRip.setIconImage(icon.getImage());
 		frmRip.setTitle("RIP");
-		frmRip.setBounds(100, 100, 429, 450);
+		frmRip.setBounds(100, 100, 459, 450);
 		frmRip.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmRip.getContentPane().setLayout(null);
 
-		JLabel lblConfigurationFile = new JLabel("Configuration File:");
-		lblConfigurationFile.setBounds(10, 11, 123, 14);
+		JLabel lblConfigurationFile = new JLabel("Config File:");
+		lblConfigurationFile.setBounds(10, 11, 123, 18);
 		frmRip.getContentPane().add(lblConfigurationFile);
 
 		txtInputFile = new JTextField();
@@ -74,7 +74,7 @@ public class MainGUI {
 				}
 			}
 		});
-		txtInputFile.setBounds(143, 8, 125, 20);
+		txtInputFile.setBounds(97, 11, 125, 20);
 		frmRip.getContentPane().add(txtInputFile);
 		txtInputFile.setColumns(10);
 
@@ -84,7 +84,7 @@ public class MainGUI {
 				startRoutingDaemon();
 			}
 		});
-		btnStartRouter.setBounds(264, 391, 146, 23);
+		btnStartRouter.setBounds(299, 392, 146, 23);
 		frmRip.getContentPane().add(btnStartRouter);
 
 		JTextArea txtOutput = new JTextArea();
@@ -94,11 +94,11 @@ public class MainGUI {
 		PrintStream out = new PrintStream(new TextAreaOutputStream(txtOutput));
 		System.setOut(out);
 		System.setErr(out);
-		scroll.setBounds(10, 52, 400, 328);
+		scroll.setBounds(10, 60, 435, 327);
 		frmRip.getContentPane().add(scroll);
 
 		JLabel lblNewLabel = new JLabel("Output");
-		lblNewLabel.setBounds(10, 36, 102, 14);
+		lblNewLabel.setBounds(12, 41, 102, 18);
 		frmRip.getContentPane().add(lblNewLabel);
 	}
 	
