@@ -7,6 +7,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,7 +23,8 @@ public class MainGUI {
 
 	private JFrame frmRip;
 	private JTextField txtInputFile;
-	JButton btnStartRouter;
+	private ImageIcon icon = new ImageIcon("rip_tombstone.png");
+	private JButton btnStartRouter;
 
 	/**
 	 * Launch the application.
@@ -53,6 +55,7 @@ public class MainGUI {
 	private void initialize() {
 		frmRip = new JFrame();
 		frmRip.setResizable(false);
+		frmRip.setIconImage(icon.getImage());
 		frmRip.setTitle("RIP");
 		frmRip.setBounds(100, 100, 429, 450);
 		frmRip.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

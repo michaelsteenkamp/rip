@@ -26,7 +26,7 @@ public class RoutingDaemon extends TimerTask {
 	public DatagramSocket OutputSocket;
 	public RoutingTable Table;
 	public Timer UpdateTimer;
-	private long updateIntervalMs = 10000;
+	public long updateIntervalMs = 10000;
 
 	public RoutingDaemon(Integer routerId, ArrayList<Integer> inputPorts,
 			ArrayList<OutputPortInformation> outputPorts) {
@@ -93,8 +93,8 @@ public class RoutingDaemon extends TimerTask {
 				removeRowsFlaggedForDeletion(Table);
 				// Set metrics to infinity and add link cost
 				RoutingTable tableToSend = Table.CloneRoutingTable();
-				setMetricsToInfinity(tableToSend, output.RouterId);
-				addLinkCost(tableToSend, output.LinkCost);
+				setMetricsToInfinity(tableToSend, output.getRouterId());
+				addLinkCost(tableToSend, output.getLinkCost());
 				tableToSend.setMyRouterId(RouterId);
 				// Write new table into object output stream
 				objectOutputStream.writeObject(tableToSend);
@@ -102,7 +102,7 @@ public class RoutingDaemon extends TimerTask {
 				byte[] buffer = arrayOutputStream.toByteArray();
 				DatagramPacket packet = new DatagramPacket(buffer,
 						buffer.length, InetAddress.getLocalHost(),
-						output.PortNumber);
+						output.getPortNumber());
 				OutputSocket.send(packet);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -155,7 +155,7 @@ public class RoutingDaemon extends TimerTask {
 	 * Processes and updates the current routing table based off the received
 	 * routing table
 	*/
-	private void processIncomingRoutingTable(RoutingTable received) {
+	private synchronized void processIncomingRoutingTable(RoutingTable received) {
 
 		ArrayList<RoutingTableRow> rowsToAddToCurrentTable = new ArrayList<RoutingTableRow>();
 
@@ -183,10 +183,10 @@ public class RoutingDaemon extends TimerTask {
 						receivedRow.LearnedFrom = received.getMyRouterId();
 						receivedRow.NextHopPortNumber = getOutputPortFromRouterId(received.getMyRouterId());
 						receivedRow.InitializeAndResetRowTimeoutTimer();
-					} else if (receivedRow.LinkCost < 16) {
 						// We have received a valid entry for the current row
 						// It is not cheaper so don't replace the current row
 						// Just reinitialise the timeout timer.
+					} else if (receivedRow.LinkCost < 16) {
 						currentRow.InitializeAndResetRowTimeoutTimer();
 						// We have learnt this row from our neighbouring router,
 						// therefore we must
@@ -232,8 +232,8 @@ public class RoutingDaemon extends TimerTask {
 
 	private int getOutputPortFromRouterId(int routerId) {
 		for (OutputPortInformation output : OutputPorts) {
-			if (output.RouterId == routerId) {
-				return output.PortNumber;
+			if (output.getRouterId() == routerId) {
+				return output.getPortNumber();
 			}
 		}
 		return 0;
@@ -241,8 +241,8 @@ public class RoutingDaemon extends TimerTask {
 
 	private int getLinkCostFromNextHopRouterId(int nextHopRouterId) {
 		for (OutputPortInformation output : OutputPorts) {
-			if (output.RouterId == nextHopRouterId) {
-				return output.LinkCost;
+			if (output.getRouterId() == nextHopRouterId) {
+				return output.getLinkCost();
 			}
 		}
 		return 0;

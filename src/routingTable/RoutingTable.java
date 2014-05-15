@@ -63,9 +63,9 @@ public class RoutingTable implements Serializable {
 		for (OutputPortInformation outputPort : outputPorts) {
 			// Learned from is 0 as this row was learned from a configuration
 			// file not another router
-			RoutingTableRow row = new RoutingTableRow(outputPort.PortNumber,
-					outputPort.RouterId, outputPort.LinkCost,
-					outputPort.RouterId, 0);
+			RoutingTableRow row = new RoutingTableRow(outputPort.getPortNumber(),
+					outputPort.getRouterId(), outputPort.getLinkCost(),
+					outputPort.getRouterId(), 0);
 			Rows.add(row);
 		}
 		
