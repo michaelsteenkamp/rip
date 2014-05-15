@@ -112,6 +112,10 @@ public class RoutingTableUpdater {
 						currentRow.LinkCost = receivedRow.LinkCost;
 					}
 				}
+				if(currentRow.DestRouterId == current.MyRouterId){
+					currentRow.LinkCost = 0;
+					currentRow.InitializeAndResetRowTimeoutTimer();
+				}
 				// A neighbouring router has come back online, reset the link
 				// cost
 				// of its row if it is still in the table
