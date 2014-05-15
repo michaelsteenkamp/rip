@@ -101,6 +101,7 @@ public class MainGUI {
 	
 	private void startRoutingDaemon(){
 		FileParser fp = new FileParser(txtInputFile.getText());
+		System.out.print(fp);
 		RoutingDaemon daemon = new RoutingDaemon(fp.getRouterId(), fp.getInputPorts(),
 				fp.getOutputPorts());
 		btnStartRouter.setEnabled(false);
