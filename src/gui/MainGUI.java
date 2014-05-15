@@ -54,12 +54,12 @@ public class MainGUI {
 		frmRip = new JFrame();
 		frmRip.setResizable(false);
 		frmRip.setTitle("RIP");
-		frmRip.setBounds(100, 100, 615, 450);
+		frmRip.setBounds(100, 100, 429, 450);
 		frmRip.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmRip.getContentPane().setLayout(null);
 
 		JLabel lblConfigurationFile = new JLabel("Configuration File:");
-		lblConfigurationFile.setBounds(10, 11, 102, 14);
+		lblConfigurationFile.setBounds(10, 11, 123, 14);
 		frmRip.getContentPane().add(lblConfigurationFile);
 
 		txtInputFile = new JTextField();
@@ -71,27 +71,18 @@ public class MainGUI {
 				}
 			}
 		});
-		txtInputFile.setBounds(122, 8, 125, 20);
+		txtInputFile.setBounds(143, 8, 125, 20);
 		frmRip.getContentPane().add(txtInputFile);
 		txtInputFile.setColumns(10);
 
-		btnStartRouter = new JButton("Start Router");
+		btnStartRouter = new JButton("Start");
 		btnStartRouter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				startRoutingDaemon();
 			}
 		});
-		btnStartRouter.setBounds(369, 391, 118, 23);
+		btnStartRouter.setBounds(264, 391, 146, 23);
 		frmRip.getContentPane().add(btnStartRouter);
-
-		JButton btnExit = new JButton("Exit");
-		btnExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
-			}
-		});
-		btnExit.setBounds(497, 391, 102, 23);
-		frmRip.getContentPane().add(btnExit);
 
 		JTextArea txtOutput = new JTextArea();
 		JScrollPane scroll = new JScrollPane(txtOutput);
@@ -100,11 +91,11 @@ public class MainGUI {
 		PrintStream out = new PrintStream(new TextAreaOutputStream(txtOutput));
 		System.setOut(out);
 		System.setErr(out);
-		scroll.setBounds(10, 52, 589, 328);
+		scroll.setBounds(10, 52, 400, 328);
 		frmRip.getContentPane().add(scroll);
 
 		JLabel lblNewLabel = new JLabel("Output");
-		lblNewLabel.setBounds(10, 36, 46, 14);
+		lblNewLabel.setBounds(10, 36, 102, 14);
 		frmRip.getContentPane().add(lblNewLabel);
 	}
 	
