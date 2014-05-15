@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
-import main.Main;
+import routingDaemon.RoutingDaemon;
 import fileParser.FileParser;
 
 public class MainGUI {
@@ -67,10 +67,7 @@ public class MainGUI {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					FileParser fp = new FileParser(txtInputFile.getText());
-					Main.StartRoutingDaemon(fp);
-					btnStartRouter.setEnabled(false);
-					txtInputFile.setEnabled(false);
+					startRoutingDaemon();
 				}
 			}
 		});
@@ -81,10 +78,7 @@ public class MainGUI {
 		btnStartRouter = new JButton("Start Router");
 		btnStartRouter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileParser fp = new FileParser(txtInputFile.getText());
-				Main.StartRoutingDaemon(fp);
-				btnStartRouter.setEnabled(false);
-				txtInputFile.setEnabled(false);
+				startRoutingDaemon();
 			}
 		});
 		btnStartRouter.setBounds(369, 391, 118, 23);
@@ -112,5 +106,13 @@ public class MainGUI {
 		JLabel lblNewLabel = new JLabel("Output");
 		lblNewLabel.setBounds(10, 36, 46, 14);
 		frmRip.getContentPane().add(lblNewLabel);
+	}
+	
+	private void startRoutingDaemon(){
+		FileParser fp = new FileParser(txtInputFile.getText());
+		RoutingDaemon daemon = new RoutingDaemon(fp.RouterId, fp.InputPorts,
+				fp.OutputPorts);
+		btnStartRouter.setEnabled(false);
+		txtInputFile.setEnabled(false);
 	}
 }
