@@ -20,13 +20,13 @@ import timer.CustomTimer;
 
 public class RoutingDaemon extends TimerTask {
 
-	public Integer RouterId;
-	public ArrayList<OutputPortInformation> OutputPorts = new ArrayList<OutputPortInformation>();
-	public ArrayList<InputSocket> InputSockets = new ArrayList<InputSocket>();
-	public DatagramSocket OutputSocket;
-	public RoutingTable Table;
-	public Timer UpdateTimer;
-	public long updateIntervalMs = 10000;
+	private Integer RouterId;
+	private ArrayList<OutputPortInformation> OutputPorts = new ArrayList<OutputPortInformation>();
+	private ArrayList<InputSocket> InputSockets = new ArrayList<InputSocket>();
+	private DatagramSocket OutputSocket;
+	private RoutingTable Table;
+	private Timer UpdateTimer;
+	private long updateIntervalMs = 10000;
 
 	public RoutingDaemon(Integer routerId, ArrayList<Integer> inputPorts,
 			ArrayList<OutputPortInformation> outputPorts) {
