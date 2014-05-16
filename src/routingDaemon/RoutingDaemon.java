@@ -257,8 +257,8 @@ public class RoutingDaemon extends TimerTask {
 				row.InitializeAndResetDeletionTimer();
 			}
 		}
+		//Send out a triggered update to our neighbours.
 		sendRoutingTableToNeighbors();
-		System.out.print(Table);
 	}
 
 	/**
