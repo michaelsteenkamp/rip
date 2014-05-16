@@ -77,7 +77,6 @@ public class RoutingTableRow implements Serializable, Cloneable {
 	class RowTimeoutTask extends TimerTask {
 
 		public void run() {
-			
 			LinkCost = 16;
 			InitializeAndResetDeletionTimer();
 		}

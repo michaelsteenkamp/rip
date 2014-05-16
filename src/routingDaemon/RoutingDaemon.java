@@ -108,6 +108,14 @@ public class RoutingDaemon extends TimerTask {
 				e.printStackTrace();
 			}
 		}
+		// Keep the row entry to ourself valid and with a cost of 0.
+		for (RoutingTableRow current : Table.getRows()) {
+			if (current.DestRouterId == Table.getMyRouterId()) {
+				current.LinkCost = 0;
+				current.InitializeAndResetRowTimeoutTimer();
+			}
+		}
+		System.out.print(Table);
 	}
 
 	private void setMetricsToInfinity(RoutingTable input, int neighbor) {
@@ -143,18 +151,17 @@ public class RoutingDaemon extends TimerTask {
 
 		while (rowIterator.hasNext()) {
 			RoutingTableRow row = rowIterator.next();
-			if (row.DeleteThisRow) {
-				System.out.println("ROW REMOVED: " + row.DestRouterId);
+			if (row.DeleteThisRow && row.DestRouterId != Table.getMyRouterId()) {
 				rowIterator.remove();
+				System.out.println(Table);
 			}
 		}
 	}
 
-
 	/**
 	 * Processes and updates the current routing table based off the received
 	 * routing table
-	*/
+	 */
 	private synchronized void processIncomingRoutingTable(RoutingTable received) {
 
 		ArrayList<RoutingTableRow> rowsToAddToCurrentTable = new ArrayList<RoutingTableRow>();
@@ -181,7 +188,8 @@ public class RoutingDaemon extends TimerTask {
 						rowsToAddToCurrentTable.add(receivedRow);
 						receivedRow.NextHopRouterId = received.getMyRouterId();
 						receivedRow.LearnedFrom = received.getMyRouterId();
-						receivedRow.NextHopPortNumber = getOutputPortFromRouterId(received.getMyRouterId());
+						receivedRow.NextHopPortNumber = getOutputPortFromRouterId(received
+								.getMyRouterId());
 						receivedRow.InitializeAndResetRowTimeoutTimer();
 						// We have received a valid entry for the current row
 						// It is not cheaper so don't replace the current row
@@ -192,13 +200,10 @@ public class RoutingDaemon extends TimerTask {
 						// therefore we must
 						// update its cost even if it is worse than our current
 						// link cost
-					} else if (currentRow.NextHopRouterId == received.getMyRouterId()) {
+					} else if (currentRow.NextHopRouterId == received
+							.getMyRouterId()) {
 						currentRow.LinkCost = receivedRow.LinkCost;
 					}
-				}
-				if (currentRow.DestRouterId == Table.getMyRouterId()) {
-					currentRow.LinkCost = 0;
-					currentRow.InitializeAndResetRowTimeoutTimer();
 				}
 				// A neighbouring router has come back online, reset the link
 				// cost
@@ -208,14 +213,14 @@ public class RoutingDaemon extends TimerTask {
 					currentRow.InitializeAndResetRowTimeoutTimer();
 					currentRow.LinkCost = getLinkCostFromNextHopRouterId(currentRow.NextHopRouterId);
 				}
-
 			}
 			// We have received a new valid row, add it to our table
 			if (!matched && receivedRow.LinkCost < 16) {
 				rowsToAddToCurrentTable.add(receivedRow);
 				receivedRow.NextHopRouterId = received.getMyRouterId();
 				receivedRow.LearnedFrom = received.getMyRouterId();
-				receivedRow.NextHopPortNumber = getOutputPortFromRouterId(received.getMyRouterId());
+				receivedRow.NextHopPortNumber = getOutputPortFromRouterId(received
+						.getMyRouterId());
 				receivedRow.InitializeAndResetRowTimeoutTimer();
 
 			}
@@ -225,10 +230,7 @@ public class RoutingDaemon extends TimerTask {
 		for (RoutingTableRow newRow : rowsToAddToCurrentTable) {
 			Table.Rows.add(newRow);
 		}
-
-		System.out.print(Table);
 	}
-
 
 	private int getOutputPortFromRouterId(int routerId) {
 		for (OutputPortInformation output : OutputPorts) {
