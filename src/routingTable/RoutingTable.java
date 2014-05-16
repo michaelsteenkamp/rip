@@ -9,114 +9,120 @@ import java.util.Comparator;
 import fileParser.OutputPortInformation;
 
 public class RoutingTable implements Serializable {
-	private static final long serialVersionUID = 4064137834678840042L;
-	private int MyRouterId;
-	public ArrayList<RoutingTableRow> Rows;
+    private static final long serialVersionUID = 4064137834678840042L;
+    private int MyRouterId;
+    public ArrayList<RoutingTableRow> Rows;
 
-	/**
-	 * Constructs a new RoutingTable with the specified router id
-	 * @param id Router id
-	 */
-	public RoutingTable(int id) {
-		MyRouterId = id;
-		Rows = new ArrayList<RoutingTableRow>();
-	}
-	
-	/**
-	 * @return the myRouterId
-	 */
-	public int getMyRouterId() {
-		return MyRouterId;
-	}
+    /**
+     * Constructs a new RoutingTable with the specified router id
+     * 
+     * @param id
+     *            Router id
+     */
+    public RoutingTable(int id) {
+        MyRouterId = id;
+        Rows = new ArrayList<RoutingTableRow>();
+    }
 
-	/**
-	 * @param myRouterId the myRouterId to set
-	 */
-	public void setMyRouterId(int myRouterId) {
-		MyRouterId = myRouterId;
-	}
+    /**
+     * @return the myRouterId
+     */
+    public int getMyRouterId() {
+        return MyRouterId;
+    }
 
-	/**
-	 * @param rows the rows to set
-	 */
-	public void setRows(ArrayList<RoutingTableRow> rows) {
-		Rows = rows;
-	}
+    /**
+     * @param myRouterId
+     *            the myRouterId to set
+     */
+    public void setMyRouterId(int myRouterId) {
+        MyRouterId = myRouterId;
+    }
 
-	/**
-	 * @return the RoutingTable rows
-	 */
-	public synchronized ArrayList<RoutingTableRow> getRows(){
-		return Rows;
-	}
+    /**
+     * @param rows
+     *            the rows to set
+     */
+    public void setRows(ArrayList<RoutingTableRow> rows) {
+        Rows = rows;
+    }
 
-	/**
-	 * Populates the initial rows of the RoutingTable
-	 * @param outputPorts
-	 */
-	public void PopulateInitialRoutingTable(
-			ArrayList<OutputPortInformation> outputPorts) {
-		
-		RoutingTableRow myself = new RoutingTableRow(0, 0, 0, MyRouterId, 0);
-		Rows.add(myself);
-		
-		for (OutputPortInformation outputPort : outputPorts) {
-			// Learned from is 0 as this row was learned from a configuration
-			// file not another router
-			RoutingTableRow row = new RoutingTableRow(outputPort.getPortNumber(),
-					outputPort.getRouterId(), outputPort.getLinkCost(),
-					outputPort.getRouterId(), 0);
-			Rows.add(row);
-		}
-		
-		System.out.print(this);
-	}
+    /**
+     * @return the RoutingTable rows
+     */
+    public synchronized ArrayList<RoutingTableRow> getRows() {
+        return Rows;
+    }
 
-	/**
-	 * @return A clone of the RoutingTable
-	 */
-	public RoutingTable CloneRoutingTable() {
-		RoutingTable clone = new RoutingTable(MyRouterId);
+    /**
+     * Populates the initial rows of the RoutingTable
+     * 
+     * @param outputPorts
+     */
+    public void PopulateInitialRoutingTable(
+            ArrayList<OutputPortInformation> outputPorts) {
 
-		for (RoutingTableRow originalRow : getRows()) {
-			clone.Rows.add(originalRow.CloneRoutingTableRow());
-		}
+        RoutingTableRow myself = new RoutingTableRow(0, 0, 0, MyRouterId, 0);
+        Rows.add(myself);
 
-		return clone;
-	}
-	
-	/**
-	 * Sorts the RoutingTable's Rows in descending order
-	 */
-	public void sortRows(){
-		Collections.sort(getRows(), new Comparator<RoutingTableRow>(){
-			@Override
-			public int compare(RoutingTableRow r1, RoutingTableRow r2){
-				return r1.DestRouterId - r2.DestRouterId;
-			}});
-	}
+        for (OutputPortInformation outputPort : outputPorts) {
+            // Learned from is 0 as this row was learned from a configuration
+            // file not another router
+            RoutingTableRow row = new RoutingTableRow(
+                    outputPort.getPortNumber(), outputPort.getRouterId(),
+                    outputPort.getLinkCost(), outputPort.getRouterId(), 0);
+            Rows.add(row);
+        }
 
-	public String toString() {
-		final Object[][] table = new String[Rows.size()][];
-		int tableCount = 0;
+        System.out.print(this);
+    }
 
-		sortRows();
-		for (RoutingTableRow row : getRows()){
-			table[tableCount] = new String[] {
-					Integer.toString(row.DestRouterId),
-					new DecimalFormat("00").format(row.LinkCost),
-					Integer.toString(row.NextHopRouterId),
-					new DecimalFormat("0000").format(row.NextHopPortNumber),
-					Integer.toString(row.LearnedFrom),
-					Integer.toString(row.TimeoutTimer.getTicks())};
-			tableCount++;
-		}
+    /**
+     * @return A clone of the RoutingTable
+     */
+    public RoutingTable CloneRoutingTable() {
+        RoutingTable clone = new RoutingTable(MyRouterId);
 
-		String output = "DestId - LinkCost - NextHopId - NextHopPort - LearnedFrom - Ticks\n";
-		for (final Object[] row : table) {
-			output += String.format("%5s%15s%15s%15s%20s%20s\n", row);
-		}
+        for (RoutingTableRow originalRow : getRows()) {
+            clone.Rows.add(originalRow.CloneRoutingTableRow());
+        }
 
-		return output;
-	}
+        return clone;
+    }
+
+    /**
+     * Sorts the RoutingTable's Rows in descending order
+     */
+    public void sortRows() {
+        Collections.sort(getRows(), new Comparator<RoutingTableRow>() {
+            @Override
+            public int compare(RoutingTableRow r1, RoutingTableRow r2) {
+                return r1.DestRouterId - r2.DestRouterId;
+            }
+        });
+    }
+
+    public String toString() {
+        final Object[][] table = new String[Rows.size()][];
+        int tableCount = 0;
+
+        sortRows();
+        for (RoutingTableRow row : getRows()) {
+            table[tableCount] = new String[] {
+                    Integer.toString(row.DestRouterId),
+                    new DecimalFormat("00").format(row.LinkCost),
+                    Integer.toString(row.NextHopRouterId),
+                    new DecimalFormat("0000").format(row.NextHopPortNumber),
+                    Integer.toString(row.LearnedFrom),
+                    Integer.toString(row.TimeoutTimer.getTicks()) };
+            tableCount++;
+        }
+
+        String output = "DestId - LinkCost - NextHopId - NextHopPort - LearnedFrom - Ticks\n";
+        for (final Object[] row : table) {
+            output += String.format("%5s%15s%15s%15s%20s%20s\n", row);
+        }
+
+        return output;
+    }
 }
